@@ -4,10 +4,20 @@
     <h1>Home</h1>
     {% if user %}
     <h1 class="text-center">Tasks</h1>
+    <form method="GET" action="/filter">
+        <label for="status">Filter By Status:</label>
+        <select id="status" name="status">
+            {% for option in status_options %}
+                <option value="{{ option }}">{{ option }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Filter">
+    </form>
     <ul class="list-group list-group-flush "id="tasks">
-        {% for task in user.tasks %}
+        {% for task in tasks %}
         <li class="list-group-item list-group-item-success">
 
+            {{task.name}}
             {{task.text}}
             {{task.created_at}}
             {% if task.created_at != task.updated_at %}
@@ -17,11 +27,19 @@
             <a href="/update-task/{{task.id}}">editar</a>
             <!-- <button type="button" class="edit" onclick="updateTaskPage('{{task.id}}')">
                 <span aria-hidden="true">&times; </span></button> -->
-            <button type="button" class="close" onclick="deleteTask('{{task.id}}')">
+            {% if task.public == false %}
+                <button type="button" class="close" onclick="deleteTask('{{task.id}}')">
+                <span aria-hidden="true" class="success">&times; </span></button>
+                <button type="button" class="close" onclick="reviveTask('{{task.id}}')">
+                <span aria-hidden="true">&check; </span></button>
+                
+            {% else %}
+                <button type="button" class="close" onclick="deleteTask('{{task.id}}')">
                 <span aria-hidden="true">&times; </span></button>
+            {%endif%}
             </li>
         {% else %}
-            <li class="mb-5">You don't have a Task, create one ;D</li>
+            <li class="mb-5">No Task Found</li>
         {% endfor %}
         
         </ul>
@@ -40,16 +58,16 @@
         <div class="form-group">
             <label>Status</label>
             <div class="form-check">
-                <input type="radio" id="todo" name="status" value="todo" class="form-check-input" checked>
-                <label for="todo" class="form-check-label">To Do</label>
+                <input type="radio" id="ToDo" name="status" value="ToDo" class="form-check-input" checked>
+                <label for="ToDo" class="form-check-label">ToDo</label>
             </div>
             <div class="form-check">
-                <input type="radio" id="done" name="status" value="done" class="form-check-input">
-                <label for="done" class="form-check-label">Done</label>
+                <input type="radio" id="Done" name="status" value="Done" class="form-check-input">
+                <label for="Done" class="form-check-label">Done</label>
             </div>
             <div class="form-check">
-                <input type="radio" id="postponed" name="status" value="postponed" class="form-check-input">
-                <label for="postponed" class="form-check-label">Postponed</label>
+                <input type="radio" id="Postponed" name="status" value="Postponed" class="form-check-input">
+                <label for="Postponed" class="form-check-label">Postponed</label>
             </div>
         </div>
     

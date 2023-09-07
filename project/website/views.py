@@ -6,12 +6,16 @@ from website import db
 import datetime
 views = Blueprint('views', __name__) # views é o que é importado no init
 
+status_options = ['None', 'ToDo', 'Done', 'Postponed', 'Deleted']
+
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
     if request.method == 'GET':
-        tasks = Task.query.filter_by(public=True, user_id=current_user.id).all()
-        return render_template("index.html", user=current_user, tasks=tasks)
+        tasks  = Task.query.filter(Task.public == True, Task.user_id == current_user.id).all()
+        for task in tasks: 
+            print(task.name, task.public)
+        return render_template("index.html", user=current_user, tasks=tasks, status_options=status_options)
 
     if request.method == 'POST':
         if not current_user.is_authenticated:
@@ -26,37 +30,84 @@ def home():
         if not text:
             flash('text is empty', category='error')
             return
-        new_task = Task(name=name, text=text, status= status, user_id=current_user.id, updated_at=datetime.datetime.now())
+        if status not in status_options:
+            flash('Dont try to be funny', category='error')
+            return
+        new_task = Task(name=name, text=text, status= status, user_id=current_user.id, updated_at=datetime.datetime.now(), public=True)
         db.session.add(new_task)
         db.session.commit()
         flash('task added', category='success')
         return redirect(url_for('views.home'))
+
+@views.route('/filter', methods=['GET'])
+@login_required
+def filter_tasks():
+    status_selected = request.args.get('status')
     
+    if status_selected and status_selected != 'None':
+        if status_selected == 'Deleted': 
+            filtered_tasks = Task.query.filter(
+                Task.public == False,
+                Task.user_id == current_user.id
+            ).all()
+        else: 
+            filtered_tasks = Task.query.filter(
+            Task.public == True,
+            Task.user_id == current_user.id,
+            Task.status == status_selected
+        ).all()
+    else:
+        filtered_tasks = Task.query.filter(
+            Task.public == True,
+            Task.user_id == current_user.id
+        ).all()
+    
+    
+    return render_template("index.html", user=current_user, tasks=filtered_tasks, status_options=status_options)
+
 
 @views.route('/delete-task', methods=['POST'])
 def delete_task():
     data = json.loads(request.data)
     task_id = data['taskId']
-    task_to_delete = Task.query.get(task_id)
-    if task_to_delete:
-        if task_to_delete.user_id == current_user.id:
-            task_to_delete.public = False  # Update the 'public' attribute
+    task = Task.query.get(task_id)
+    if task:
+        if task.user_id == current_user.id:
+            if task.public == True:
+                task.public = False  # Update the 'public' attribute
+            else:
+                 db.session.delete(task)
             db.session.commit()  # Commit the changes to the database
-            flash('Task deleted', category='success')
+            flash('Task resaved', category='success')
             return redirect(url_for('views.home'))
         else:
             flash('You cannot delete this task', category='error')
             return redirect(url_for('views.home'))
     return jsonify({})
 
+@views.route('/revive-task', methods=['POST'])
+def revive_task():
+    data = json.loads(request.data)
+    task_id = data['taskId']
+    task = Task.query.get(task_id)
+    if task:
+        if task.user_id == current_user.id:
+            task.public = True  # Update the 'public' attribute
+            db.session.commit()  # Commit the changes to the database
+            flash('Task revived', category='success')
+            return redirect(url_for('views.home'))
+        else:
+            flash('You cannot revive this task', category='error')
+            return redirect(url_for('views.home'))
+    return jsonify({})
+
+
 
 
 @views.route('/update-task/<int:task_id>', methods=['GET','POST'])
 def update_task(task_id):
     if request.method == 'GET':
-        print("aaa")
         task_to_update = Task.query.get(task_id)
-        print("z")
         return render_template("update.html", task=task_to_update)
     
     if request.method == 'POST':
@@ -74,7 +125,11 @@ def update_task(task_id):
                     return
                 task_to_update.name = name
                 task_to_update.text = text
+                if status not in status_options:
+                    flash('Dont try to be funny', category='error')
+                    return
                 task_to_update.status = status
+                
                 db.session.commit()
                 flash('task updated', category='success')
             else:

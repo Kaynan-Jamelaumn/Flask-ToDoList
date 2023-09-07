@@ -17,16 +17,16 @@
         <div class="form-group">
             <label>Status</label>
             <div class="form-check">
-                <input type="radio" id="done" name="status" value="done" class="form-check-input"  {% if task.status == 'done' %}checked{% endif %}>
-                <label for="done" class="form-check-label">Done</label>
+                <input type="radio" id="ToDo" name="status" value="ToDo" class="form-check-input"  {% if task.status == 'ToDo' %}checked{% endif %}>
+                <label for="ToDo" class="form-check-label">ToDo</label>
             </div>
             <div class="form-check">
-                <input type="radio" id="postponed" name="status" value="postponed" class="form-check-input" {% if task.status == 'postponed' %}checked{% endif %}>
-                <label for="postponed" class="form-check-label">Postponed</label>
+                <input type="radio" id="Done" name="status" value="Done" class="form-check-input" {% if task.status == 'Done' %}checked{% endif %}>
+                <label for="Done" class="form-check-label">Done</label>
             </div>
             <div class="form-check">
-                <input type="radio" id="todo" name="status" value="todo" class="form-check-input"  {% if task.status == 'todo' %}checked{% endif %}>
-                <label for="todo" class="form-check-label">To Do</label>
+                <input type="radio" id="Postponed" name="status" value="Postponed" class="form-check-input"  {% if task.status == 'Postponed' %}checked{% endif %}>
+                <label for="Postponed" class="form-check-label">Postponed</label>
             </div>
         </div>
     

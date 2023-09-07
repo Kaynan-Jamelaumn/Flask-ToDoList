@@ -21,9 +21,9 @@ class Task(db.Model):
     name = db.Column(db.String(200))
     text = db.Column(db.String(1000))
     status = db.Column(db.String(20))
+    public = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now)
     updated_at = db.Column(db.DateTime(timezone=True), default=datetime.datetime.now, onupdate=datetime.datetime.now)
-    public = db.Column(db.Boolean, default=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id')) #user_id is the name of the table and the field
 
 # @event.listens_for(Task, 'before_update')
