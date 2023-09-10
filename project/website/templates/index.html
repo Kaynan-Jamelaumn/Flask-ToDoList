@@ -4,76 +4,47 @@
     <h1>Home</h1>
     {% if user %}
     <h1 class="text-center">Tasks</h1>
-    <form method="GET" action="/filter">
-        <label for="status">Filter By Status:</label>
-        <select id="status" name="status">
-            {% for option in status_options %}
-                <option value="{{ option }}">{{ option }}</option>
-            {% endfor %}
-        </select>
-        <input type="submit" value="Filter">
+    <a href="{{ url_for('views.create_task') }}" class="btn btn-primary">New Task</a>
+    <form method="GET" action="/filter" class="form-inline mb-2">
+        <div class="form-group">
+            <label for="status" class="mr-2">Filter By Status:</label>
+            <select id="status" name="status" class="form-control">
+                {% for option in status_options %}
+                    <option value="{{ option }}">{{ option }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary ml-2">Filter</button>
     </form>
-    <ul class="list-group list-group-flush "id="tasks">
+    
+    <ul class="list-group" id="tasks">
         {% for task in tasks %}
-        <li class="list-group-item list-group-item-success">
-
-            {{task.name}}
-            {{task.text}}
-            {{task.created_at}}
-            {% if task.created_at != task.updated_at %}
-                {{task.updated_at}}
-            {% endif %}
-            {{task.status}}
-            <a href="/update-task/{{task.id}}">editar</a>
-            <!-- <button type="button" class="edit" onclick="updateTaskPage('{{task.id}}')">
-                <span aria-hidden="true">&times; </span></button> -->
-            {% if task.public == false %}
-                <button type="button" class="close" onclick="deleteTask('{{task.id}}')">
-                <span aria-hidden="true" class="success">&times; </span></button>
-                <button type="button" class="close" onclick="reviveTask('{{task.id}}')">
-                <span aria-hidden="true">&check; </span></button>
-                
-            {% else %}
-                <button type="button" class="close" onclick="deleteTask('{{task.id}}')">
-                <span aria-hidden="true">&times; </span></button>
-            {%endif%}
-            </li>
+        <li class="list-group-item" id="task-{{ task.id }}">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>{{ task.name }}</h5>
+                    <p>{{ task.text }}</p>
+                    <p>Created at: {{ task.created_at }}</p>
+                    {% if task.created_at != task.updated_at %}
+                        <p>Updated at: {{ task.updated_at }}</p>
+                    {% endif %}
+                    <p>Status: {{ task.status }}</p>
+                </div>
+                <div class="text-right">
+                    {% if not task.public %}
+                        <button type="button" class="btn btn-danger" onclick="deleteTask('{{ task.id }}')">&times;</button>
+                        <button type="button" class="btn btn-success" onclick="reviveTask('{{ task.id }}')">&#10003;</button>
+                    {% else %}
+                        <button type="button" class="btn btn-danger" onclick="deleteTask('{{ task.id }}')">&times;</button>
+                    {% endif %}
+                    <a href="/update-task/{{ task.id }}" class="btn btn-primary">Edit</a>
+                </div>
+            </div>
+        </li>
         {% else %}
-            <li class="mb-5">No Task Found</li>
+            <li class="mb-5">No task found</li>
         {% endfor %}
-        
-        </ul>
-    {% endif %}
-    <form method="POST" class="container mt-5">
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" class="form-control">
-        </div>
-    
-        <div class="form-group">
-            <label for="text">Description</label>
-            <textarea name="text" id="text" class="form-control"></textarea>
-        </div>
-    
-        <div class="form-group">
-            <label>Status</label>
-            <div class="form-check">
-                <input type="radio" id="ToDo" name="status" value="ToDo" class="form-check-input" checked>
-                <label for="ToDo" class="form-check-label">ToDo</label>
-            </div>
-            <div class="form-check">
-                <input type="radio" id="Done" name="status" value="Done" class="form-check-input">
-                <label for="Done" class="form-check-label">Done</label>
-            </div>
-            <div class="form-check">
-                <input type="radio" id="Postponed" name="status" value="Postponed" class="form-check-input">
-                <label for="Postponed" class="form-check-label">Postponed</label>
-            </div>
-        </div>
-    
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary">Add a Task</button>
-        </div>
-    </form>
+    </ul>
 
+    {% endif %}
 {% endblock %}

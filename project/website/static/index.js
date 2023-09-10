@@ -3,7 +3,10 @@ function deleteTask(taskId) {
         method: "POST",
         body: JSON.stringify({ taskId: taskId }),
     }).then((_res) => {
-        window.location.href = "/";
+        const taskElement = document.getElementById(`task-${taskId}`);
+        if (taskElement) {
+            taskElement.remove();
+        }
     }).catch((err) => console.log(err));
 }
 
@@ -12,7 +15,10 @@ function reviveTask(taskId) {
         method: "POST",
         body: JSON.stringify({ taskId: taskId }),
     }).then((_res) => {
-        window.location.href = "/";
+        const taskElement = document.getElementById(`task-${taskId}`);
+        if (taskElement) {
+            taskElement.remove();
+        }
     }).catch((err) => console.log(err));
 }
 

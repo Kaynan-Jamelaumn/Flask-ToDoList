@@ -8,7 +8,7 @@ views = Blueprint('views', __name__) # views é o que é importado no init
 
 status_options = ['None', 'ToDo', 'Done', 'Postponed', 'Deleted']
 
-@views.route('/', methods=['GET', 'POST'])
+@views.route('/', methods=['GET'])
 @login_required
 def home():
     if request.method == 'GET':
@@ -16,29 +16,6 @@ def home():
         for task in tasks: 
             print(task.name, task.public)
         return render_template("index.html", user=current_user, tasks=tasks, status_options=status_options)
-
-    if request.method == 'POST':
-        if not current_user.is_authenticated:
-            flash('You must be logged in to add a task', category='error')
-            return redirect(url_for('auth.login'))
-        name = request.form.get('name')
-        text = request.form.get('text')
-        status = request.form.get('status')
-        if not name:
-            flash('name is empty', category='error')
-            return
-        if not text:
-            flash('text is empty', category='error')
-            return
-        if status not in status_options:
-            flash('Dont try to be funny', category='error')
-            return
-        new_task = Task(name=name, text=text, status= status, user_id=current_user.id, updated_at=datetime.datetime.now(), public=True)
-        db.session.add(new_task)
-        db.session.commit()
-        flash('task added', category='success')
-        return redirect(url_for('views.home'))
-
 @views.route('/filter', methods=['GET'])
 @login_required
 def filter_tasks():
@@ -138,6 +115,35 @@ def update_task(task_id):
              flash('Task not found', category='error') 
     return redirect(url_for('views.home'))
 
+
+
+@views.route('/create-task', methods=['GET','POST'])
+def create_task():
+    if request.method == 'GET':
+        
+        return render_template("create.html", user=current_user)
+
+    if request.method == 'POST':
+        if not current_user.is_authenticated:
+            flash('You must be logged in to add a task', category='error')
+            return redirect(url_for('auth.login'))
+        name = request.form.get('name')
+        text = request.form.get('text')
+        status = request.form.get('status')
+        if not name:
+            flash('name is empty', category='error')
+            return
+        if not text:
+            flash('text is empty', category='error')
+            return
+        if status not in status_options:
+            flash('Dont try to be funny', category='error')
+            return
+        new_task = Task(name=name, text=text, status= status, user_id=current_user.id, updated_at=datetime.datetime.now(), public=True)
+        db.session.add(new_task)
+        db.session.commit()
+        flash('task added', category='success')
+        return redirect(url_for('views.home'))
 # @views.route('/update-task-request', methods=['POST'])
 # def update_task_request():
 #     if request.method == 'POST':
