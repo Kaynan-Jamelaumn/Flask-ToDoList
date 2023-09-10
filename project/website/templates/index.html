@@ -4,7 +4,8 @@
     <h1>Home</h1>
     {% if user %}
     <h1 class="text-center">Tasks</h1>
-    <a href="{{ url_for('views.create_task') }}" class="btn btn-primary">New Task</a>
+    <a href="{{ url_for('views.criar') }}" class="btn btn-primary btn-block mb-2">Nova Tarefa</a>
+
     <form method="GET" action="/filter" class="form-inline mb-2">
         <div class="form-group">
             <label for="status" class="mr-2">Filter By Status:</label>

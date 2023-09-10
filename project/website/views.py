@@ -13,8 +13,6 @@ status_options = ['None', 'ToDo', 'Done', 'Postponed', 'Deleted']
 def home():
     if request.method == 'GET':
         tasks  = Task.query.filter(Task.public == True, Task.user_id == current_user.id).all()
-        for task in tasks: 
-            print(task.name, task.public)
         return render_template("index.html", user=current_user, tasks=tasks, status_options=status_options)
 @views.route('/filter', methods=['GET'])
 @login_required
