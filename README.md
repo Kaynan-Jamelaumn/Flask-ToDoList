@@ -1,0 +1,8 @@
+# Flask-ToDoList
+
+flask db init
+flask db migrate
+flask db upgrade
+
+cd project
+python main.py
